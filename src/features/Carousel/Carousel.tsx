@@ -1,26 +1,29 @@
-import { Card, IFrameProps } from "./components/CardFrame";
 import { Group, Vector3 } from "three";
-import React, { useEffect, useRef } from "react";
-import { CarouselButtons } from "./components/CarouselButtons";
-import { CardState } from "./types/cardState";
 import { OrbitControls } from "@react-three/drei";
+import React, { useEffect, useRef } from "react";
 import anime from "animejs";
+
 import { useCarousel } from "./hooks/use-carousel";
+import { Card, IFrameProps } from "./components/Card";
+import { CarouselButtons } from "./components/CarouselButtons";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
+import { useUserState } from "../../hooks/useUserState";
+
+const RADIUS = 2;
+const DISTANCE = 0.9;
+const ANIMATION_TIME = 600;
 
 const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
   initialCards,
 }) => {
-  const { cards, selectedIndex, handlePrevious, handleNext, handleCardClick } =
+  const { selectedIndex, handlePrevious, handleNext, handleCardClick } =
     useCarousel(initialCards);
-
+  const { login } = useUserState();
   const carouselRef = useRef<Group>(null);
   const orbitRef = useRef<OrbitControlsType>(null);
-  const radius = 2;
-  const distance = 0.9;
-  const totalCards = cards.length;
-  const timeToLerp = 400;
+  const totalCards = initialCards.length;
 
+  //set tween animations by using effect
   useEffect(() => {
     if (carouselRef.current && orbitRef.current) {
       const activeCard = carouselRef.current.children[selectedIndex];
@@ -30,7 +33,7 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
 
         const orbitControls = orbitRef.current;
         const camera = orbitControls.object;
-        const customRadius = radius + 5;
+        const customRadius = RADIUS + 5;
 
         // Calculate the position of the camera around the carousel
         const theta = (2 * Math.PI * selectedIndex) / totalCards;
@@ -42,8 +45,8 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
           targets: camera.position,
           x: x,
           y: cameraPosition.y,
-          z: cameraPosition.z,
-          duration: timeToLerp,
+          z: z,
+          duration: ANIMATION_TIME,
           easing: "easeInOutQuad",
           complete: () => {
             camera.lookAt(activeCardPosition);
@@ -74,19 +77,28 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
         {initialCards.map((props, index) => {
           const isActive = index === selectedIndex;
           const angle = (2 * Math.PI * index) / totalCards;
-          const x = Math.cos(angle) * (radius + distance * (isActive ? 0 : 1));
-          const z = Math.sin(angle) * (radius + distance * (isActive ? 0 : 1));
-
+          const x = Math.cos(angle) * (RADIUS + DISTANCE * (isActive ? 0 : 1));
+          const z = Math.sin(angle) * (RADIUS + DISTANCE * (isActive ? 0 : 1));
+          let canClick = true;
           return (
             <Card
               onPointerDown={(e) => {
                 e.stopPropagation();
+                if (!canClick) return;
                 handleCardClick(index);
               }}
               key={props.id}
               {...props}
               position={[x, 0, z]}
-              state={isActive ? CardState.Active : CardState.Idle}
+              active={index === selectedIndex}
+              hidden={login}
+              onPointerEnter={() => {}}
+              onPointerMove={() => {
+                canClick = false;
+              }}
+              onPointerUp={() => {
+                canClick = true;
+              }}
             />
           );
         })}

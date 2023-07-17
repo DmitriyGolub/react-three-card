@@ -11,7 +11,7 @@ import {
 
 import { Environment, useGLTF, useTexture } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
-import { CustomGroupProps } from "./types";
+import { CustomGroupProps } from "../types/types";
 
 type GLTFResult = GLTF & {
   nodes: {

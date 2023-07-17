@@ -1,11 +1,9 @@
-import React, { Ref, useEffect, useRef, useState } from "react";
-import { useLocation, useRoute } from "wouter";
+import React, { Ref, useEffect, useRef } from "react";
 import {
   MeshPortalMaterial,
   PortalMaterialType,
   RoundedBox,
   Text,
-  useCursor,
   useTexture,
 } from "@react-three/drei";
 import {
@@ -13,14 +11,15 @@ import {
   Euler,
   FrontSide,
   Group,
+  MeshStandardMaterial,
   SRGBColorSpace,
   Texture,
   Vector3,
 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { GroupProps } from "@react-three/fiber/dist/declarations/src/three-types";
-import { CardState } from "../types/cardState";
 import anime from "animejs";
+
 import { BackgroundSphere } from "../../../components/BackgroundSphere";
 
 export interface IFrameProps extends GroupProps {
@@ -30,7 +29,11 @@ export interface IFrameProps extends GroupProps {
   width?: number;
   height?: number;
   children: JSX.Element;
-  state?: CardState;
+  id: number;
+  active?: boolean;
+  hidden?: boolean;
+
+  onClick?(): void;
 }
 
 export const Card: React.FC<IFrameProps> = ({
@@ -41,30 +44,29 @@ export const Card: React.FC<IFrameProps> = ({
   width = 1,
   height = 1.61803398875,
   children,
-  state = CardState.Idle,
+  active,
+  hidden,
+  onClick,
   ...props
-}) => {
+}: IFrameProps) => {
   const portal: Ref<PortalMaterialType> = useRef<PortalMaterialType>(null);
   const ref: Ref<Group> = useRef<Group>(new Group());
   const cardBack: Texture = useTexture(
     "/src/assets/textures/card_fallback.png"
   ).clone();
-
   cardBack.colorSpace = SRGBColorSpace;
-  const [, setLocation] = useLocation();
-  const [, params] = useRoute("/item/:id");
-  const [hovered, hover] = useState(false);
-  useCursor(hovered);
 
+  //#region "Animations"
   useEffect(() => {
-    if (state === CardState.Active) {
+    //for active state
+    if (active) {
       anime({
         targets: [(ref.current as Group).scale],
         x: 2,
         y: 2,
         z: 2,
         duration: 400,
-        easing: "easeInCubic",
+        easing: "linear",
       });
     } else {
       anime({
@@ -76,22 +78,44 @@ export const Card: React.FC<IFrameProps> = ({
         easing: "linear",
       });
     }
+    //for hidden
+    if (hidden) {
+      anime({
+        targets: [(ref.current as Group).rotation],
+        y: Math.PI / 2,
+        duration: 400,
+        easing: "easeInCubic",
+        complete: () => {
+          ref.current!.lookAt(ref.current!.position.clone().multiplyScalar(2));
+        },
+      });
+    } else {
+      (ref.current as Group).rotation.y = 0;
+    }
   });
+  //#endregion "My Region"
 
+  //#region "Flying Frame Animation"
   useFrame((delta) => {
     if (!ref.current) return;
-
     const t = delta.clock.getElapsedTime();
 
-    ref.current.rotation.set(
-      Math.cos(t / 4) / 100,
-      Math.sin(t / 20) / 8,
-      0 - (1 + Math.sin(t / 3)) / 50
-    );
-    ref.current.position.y = (1 + Math.sin(t / 1.5)) / 10;
+    if (!active) {
+      ref.current.rotation.set(
+        Math.cos(t / 4) / 100,
+        Math.sin(t / 20) / 8,
+        0 - (1 + Math.sin(t / 3)) / 50
+      );
+      ref.current.position.y = (1 + Math.sin(t / 1.5)) / 10;
+    } else {
+      ref.current.rotation.set(0, 0, 0);
+      ref.current.position.y = 0;
+    }
 
     ref.current.lookAt(new Vector3(0, 0, 0));
   });
+  //#endregion "Flying Frame Animation"
+
   return (
     <group ref={ref} {...props}>
       <Text
@@ -123,24 +147,15 @@ export const Card: React.FC<IFrameProps> = ({
       >
         {author}
       </Text>
-      <mesh
-        onDoubleClick={(e) => (
-          e.stopPropagation(), setLocation("/item/" + e.object.name)
-        )}
-        onPointerOver={() => hover(true)}
-        onPointerOut={() => hover(false)}
-      >
+      <mesh>
         <RoundedBox
           rotation={new Euler(0, -Math.PI, 0)}
           args={[width, height, 0]}
           radius={0.02}
+          visible={!hidden}
         >
-          <MeshPortalMaterial
-            ref={portal}
-            events={params?.id === id}
-            side={FrontSide}
-          >
-            <BackgroundSphere radius={120} color={bg!} />
+          <MeshPortalMaterial ref={portal} side={FrontSide}>
+            <BackgroundSphere radius={30} color={bg!} />
             {children}
           </MeshPortalMaterial>
         </RoundedBox>
@@ -148,10 +163,18 @@ export const Card: React.FC<IFrameProps> = ({
         <RoundedBox
           rotation={new Euler(0, -Math.PI, 0)}
           args={[width, height, 0]}
+          radius={0.02}
+          visible={hidden}
+          material={new MeshStandardMaterial({ map: cardBack })}
+        />
+
+        <RoundedBox
+          rotation={new Euler(0, -Math.PI, 0)}
+          args={[width, height, 0]}
           radius={0.005}
-          position={new Vector3(0, 0, 0.03)}
+          position={new Vector3(0, 0, 0.025)}
         >
-          <ambientLight intensity={0.5} />
+          <ambientLight intensity={0.4} />
           <meshStandardMaterial map={cardBack} side={DoubleSide} />
         </RoundedBox>
       </mesh>

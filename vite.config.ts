@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      gltf: `${path.resolve(__dirname, "./src/components/")}`,
+      gltf: `${path.resolve(__dirname, "./src/assets/gltf")}`,
     },
   },
 });

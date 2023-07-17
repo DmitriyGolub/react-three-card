@@ -1,5 +1,6 @@
 import React from "react";
 import { Html } from "@react-three/drei";
+
 import "./button.css";
 
 interface CarouselButtonsProps {
@@ -12,21 +13,20 @@ export const CarouselButtons: React.FC<CarouselButtonsProps> = ({
   handleNext,
 }) => {
   return (
-    <>
-      <Html
-        fullscreen={true}
+    <Html>
+      <div
+        className={"current-button-container"}
         style={{
-          position: "fixed",
-          top: "50%",
-          right: 0,
-          transform: "translateX(100%)",
+          transform: "translateX(50%)",
+          zIndex: 2,
         }}
       >
         <button
           onClick={handlePrevious}
-          className="button-container"
+          className="current-button"
           style={{
-            transform: "translateX(-110%) translateY(-90%)",
+            transform: "translateX(-25%) translateY(125%)",
+            rotate: "90deg",
           }}
         >
           <svg
@@ -34,26 +34,25 @@ export const CarouselButtons: React.FC<CarouselButtonsProps> = ({
             width="24"
             height="24"
             viewBox="0 0 24 24"
-            transform="rotate(90 0 0)"
+            // transform="rotate(90 0 0)"
           >
             <path d="M0 16.67l2.829 2.83 9.175-9.339 9.167 9.339 2.829-2.83-11.996-12.17z" />
           </svg>
         </button>
-      </Html>
-      <Html
-        fullscreen={true}
+      </div>
+      <div
+        className={"current-button-container"}
         style={{
-          position: "fixed",
-          top: "50%",
-          left: 0,
           transform: "translateX(-50%)",
+          zIndex: "1",
         }}
       >
         <button
           onClick={handleNext}
-          className="button-container"
+          className="current-button"
           style={{
-            transform: "translateX(10%) translateY(-90%)",
+            transform: "translateX(25%) translateY(25%)",
+            rotate: "-90deg",
           }}
         >
           <svg
@@ -61,12 +60,12 @@ export const CarouselButtons: React.FC<CarouselButtonsProps> = ({
             width="24"
             height="24"
             viewBox="0 0 24 24"
-            transform="rotate(-90 0 0)"
+            // transform="rotate(-90 0 0)"
           >
             <path d="M0 16.67l2.829 2.83 9.175-9.339 9.167 9.339 2.829-2.83-11.996-12.17z" />
           </svg>
         </button>
-      </Html>
-    </>
+      </div>
+    </Html>
   );
 };

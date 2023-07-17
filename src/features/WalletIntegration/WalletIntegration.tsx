@@ -12,16 +12,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 
 const config = createConfig({
   autoConnect: true,
-  connectors: [
-    new MetaMaskConnector({ chains }),
-    // new InjectedConnector({
-    //   chains,
-    //   options: {
-    //     name: "Injected",
-    //     shimDisconnect: true,
-    //   },
-    // }),
-  ],
+  connectors: [new MetaMaskConnector({ chains })],
   publicClient,
   webSocketPublicClient,
 });

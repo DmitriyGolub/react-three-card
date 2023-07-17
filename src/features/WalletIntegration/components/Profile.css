@@ -1,6 +1,25 @@
-.profile-button-container {
-    position: fixed;
-    top: 10px;
-    z-index: 1;
-    right: 10px;
+.profile-container {
+    position: absolute;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    left: 50%;
+    bottom: 3%;
+}
+
+
+.profile {
+    border-radius: 100px;
+    background: #2D8DFF;
+    transform: translateX(-50%);
+    font-size: 1.3em;
+    color: floralwhite;
+    width: 14em;
+
+}
+
+.profile img {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 5px;
 }

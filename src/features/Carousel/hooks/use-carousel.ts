@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { IFrameProps } from "../components/CardFrame";
-import { CardState } from "../types/cardState";
+import { IFrameProps } from "../components/Card";
 
 export const useCarousel = (initialCards: IFrameProps[]) => {
   const [cards] = useState(initialCards);
@@ -18,7 +17,7 @@ export const useCarousel = (initialCards: IFrameProps[]) => {
 
   const handleCardClick = (index: number) => {
     initialCards.map((card) => {
-      if (card.state === selectedIndex) card.state = CardState.Idle;
+      if (index === selectedIndex) card.active = true;
     });
     setSelectedIndex(index);
   };

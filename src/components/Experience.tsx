@@ -1,5 +1,5 @@
 import { OrbitControls } from "@react-three/drei";
-import { IFrameProps } from "../features/Carousel/components/CardFrame";
+import { IFrameProps } from "../features/Carousel/components/Card";
 import { Shroom } from "./Shroom";
 import { Crypt } from "./Crypt";
 import { Vector2 } from "three";
@@ -74,8 +74,7 @@ export const Experience = () => {
   return (
     <>
       <Carousel initialCards={currentCard} />
-      {/*<Carousel initialCards={currentCard} />*/}
-      <OrbitControls />
+      <OrbitControls enableZoom={false} />
     </>
   );
 };
