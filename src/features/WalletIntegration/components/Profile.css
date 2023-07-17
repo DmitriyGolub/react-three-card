@@ -1,0 +1,6 @@
+.profile-button-container {
+    position: fixed;
+    top: 10px;
+    z-index: 1;
+    right: 10px;
+}
