@@ -1,9 +1,10 @@
-import React, { Ref, useEffect, useRef } from "react";
+import React, { Ref, useEffect, useRef, useState } from "react";
 import {
   MeshPortalMaterial,
   PortalMaterialType,
   RoundedBox,
   Text,
+  useCursor,
   useTexture,
 } from "@react-three/drei";
 import {
@@ -55,6 +56,9 @@ export const Card: React.FC<IFrameProps> = ({
     "/src/assets/textures/card_fallback.png"
   ).clone();
   cardBack.colorSpace = SRGBColorSpace;
+
+  const [hovered, hover] = useState(false);
+  useCursor(hovered);
 
   //#region "Animations"
   useEffect(() => {
@@ -147,7 +151,7 @@ export const Card: React.FC<IFrameProps> = ({
       >
         {author}
       </Text>
-      <mesh>
+      <mesh onPointerOver={() => hover(true)} onPointerOut={() => hover(false)}>
         <RoundedBox
           rotation={new Euler(0, -Math.PI, 0)}
           args={[width, height, 0]}

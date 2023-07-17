@@ -79,12 +79,10 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
           const angle = (2 * Math.PI * index) / totalCards;
           const x = Math.cos(angle) * (RADIUS + DISTANCE * (isActive ? 0 : 1));
           const z = Math.sin(angle) * (RADIUS + DISTANCE * (isActive ? 0 : 1));
-          let canClick = true;
           return (
             <Card
               onPointerDown={(e) => {
                 e.stopPropagation();
-                if (!canClick) return;
                 handleCardClick(index);
               }}
               key={props.id}
@@ -93,12 +91,8 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
               active={index === selectedIndex}
               hidden={login}
               onPointerEnter={() => {}}
-              onPointerMove={() => {
-                canClick = false;
-              }}
-              onPointerUp={() => {
-                canClick = true;
-              }}
+              onPointerMove={() => {}}
+              onPointerUp={() => {}}
             />
           );
         })}
