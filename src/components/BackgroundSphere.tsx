@@ -10,6 +10,8 @@ import {
 import { MeshProps } from "@react-three/fiber";
 import { useRef } from "react";
 
+import sphere from "textures/sky.png";
+
 export interface BackgroundSphereProps extends MeshProps {
   radius: number;
   color: [number, number, number];
@@ -17,9 +19,7 @@ export interface BackgroundSphereProps extends MeshProps {
 
 export const BackgroundSphere = (props: BackgroundSphereProps) => {
   const ref = useRef<Mesh>(null);
-  const cardBack: Texture = useTexture(
-    "/src/assets/textures/blue_skybox.png"
-  ).clone();
+  const cardBack: Texture = useTexture(sphere).clone();
   cardBack.colorSpace = SRGBColorSpace;
 
   const material = new MeshStandardMaterial({

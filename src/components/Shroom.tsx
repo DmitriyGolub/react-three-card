@@ -12,6 +12,9 @@ import { Environment, useGLTF, useTexture } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import { CustomGroupProps } from "../types/types";
 
+import dungeonTexture from "textures/Dungeons_Texture_01_A.png";
+import gltfShroom from "gltf/mushroom.gltf";
+
 type GLTFResult = GLTF & {
   nodes: {
     SM_Env_Mushroom_Small_01: Mesh;
@@ -20,9 +23,7 @@ type GLTFResult = GLTF & {
 
 export function Shroom(props: CustomGroupProps) {
   const group: Ref<Group> = useRef<Group>(null);
-  const colorMap: Texture = useTexture(
-    "/src/assets/textures/Dungeons_Texture_01_A.png"
-  ).clone();
+  const colorMap: Texture = useTexture(dungeonTexture).clone();
 
   colorMap.wrapS = colorMap.wrapT = RepeatWrapping;
   colorMap.repeat.set(1, 1);
@@ -33,9 +34,7 @@ export function Shroom(props: CustomGroupProps) {
   colorMap.colorSpace = SRGBColorSpace;
   colorMap.needsUpdate = true;
 
-  const { nodes } = useGLTF(
-    "/src/assets/gltf/SM_Env_Mushroom_Small_01.gltf"
-  ) as GLTFResult;
+  const { nodes } = useGLTF(gltfShroom) as GLTFResult;
   return (
     <group ref={group} {...props} dispose={null}>
       <ambientLight intensity={0.7} />
@@ -65,4 +64,4 @@ export function Shroom(props: CustomGroupProps) {
   );
 }
 
-useGLTF.preload("/src/assets/gltf/SM_Env_Mushroom_Small_01.gltf");
+useGLTF.preload(gltfShroom);

@@ -6,9 +6,13 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   base: "",
+  assetsInclude: ["**/*.gltf", "**/*.png"],
   resolve: {
     alias: {
+      "@": `${path.resolve(__dirname, "./src/")}`,
       gltf: `${path.resolve(__dirname, "./src/assets/gltf")}`,
+      textures: `${path.resolve(__dirname, "./src/assets/textures")}`,
+      public: `${path.resolve(__dirname, "./public")}`,
     },
   },
 });

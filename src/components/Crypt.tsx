@@ -9,9 +9,12 @@ import {
   Vector3,
 } from "three";
 
-import { Environment, useGLTF, useTexture } from "@react-three/drei";
+import { useGLTF, useTexture } from "@react-three/drei";
 import { GLTF } from "three-stdlib";
 import { CustomGroupProps } from "../types/types";
+
+import dungeonTexture from "textures/Dungeons_Texture_01_A.png";
+import gltfCrypt from "gltf/crypt.gltf";
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -20,10 +23,9 @@ type GLTFResult = GLTF & {
 };
 
 export function Crypt(props: CustomGroupProps) {
+  console.log(gltfCrypt);
   const group: Ref<Group> = useRef<Group>(null);
-  const colorMap: Texture = useTexture(
-    "/src/assets/textures/Dungeons_Texture_01_A.png"
-  ).clone();
+  const colorMap: Texture = useTexture(dungeonTexture).clone();
 
   colorMap.wrapS = colorMap.wrapT = RepeatWrapping;
   colorMap.repeat.set(1, 1);
@@ -35,10 +37,7 @@ export function Crypt(props: CustomGroupProps) {
   colorMap.colorSpace = SRGBColorSpace;
   colorMap.needsUpdate = true;
 
-  console.log(colorMap);
-  const { nodes } = useGLTF(
-    "/src/assets/gltf/SM_Env_Entrance_Crypt_03.gltf"
-  ) as GLTFResult;
+  const { nodes } = useGLTF(gltfCrypt) as GLTFResult;
   return (
     <group ref={group} {...props} dispose={null}>
       <ambientLight intensity={0.7} />
@@ -47,15 +46,11 @@ export function Crypt(props: CustomGroupProps) {
         angle={0.1}
         penumbra={1}
         position={[10, 5, 10]}
-        castShadow
       />
-      <Environment preset="city" />
       <group name="Root_Scene">
         <group name="RootNode">
           <mesh
-            name="SM_Env_Mushroom_Small_01"
-            castShadow
-            receiveShadow
+            name="SM_Env_Entrance_Crypt_03"
             geometry={nodes.SM_Env_Entrance_Crypt_03.geometry}
             scale={new Vector3(25, 25, 25)}
             position={new Vector3(0, -0.5, -0.1)}
@@ -69,4 +64,4 @@ export function Crypt(props: CustomGroupProps) {
   );
 }
 
-useGLTF.preload("/src/assets/gltf/SM_Env_Entrance_Crypt_03.gltf");
+useGLTF.preload(gltfCrypt);
