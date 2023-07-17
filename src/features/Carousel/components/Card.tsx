@@ -22,6 +22,7 @@ import { GroupProps } from "@react-three/fiber/dist/declarations/src/three-types
 import anime from "animejs";
 
 import { BackgroundSphere } from "../../../components/BackgroundSphere";
+import cardBackTexture from "textures/card_fallback.png";
 
 export interface IFrameProps extends GroupProps {
   name: string;
@@ -52,9 +53,7 @@ export const Card: React.FC<IFrameProps> = ({
 }: IFrameProps) => {
   const portal: Ref<PortalMaterialType> = useRef<PortalMaterialType>(null);
   const ref: Ref<Group> = useRef<Group>(new Group());
-  const cardBack: Texture = useTexture(
-    "/src/assets/textures/card_fallback.png"
-  ).clone();
+  const cardBack: Texture = useTexture(cardBackTexture).clone();
   cardBack.colorSpace = SRGBColorSpace;
 
   const [hovered, hover] = useState(false);
