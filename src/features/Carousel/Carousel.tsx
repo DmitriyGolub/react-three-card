@@ -1,12 +1,12 @@
 import { Group, Vector3 } from "three";
 import { OrbitControls } from "@react-three/drei";
 import React, { useEffect, useRef } from "react";
+import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import anime from "animejs";
 
 import { useCarousel } from "./hooks/use-carousel";
 import { Card, IFrameProps } from "./components/Card";
 import { CarouselButtons } from "./components/CarouselButtons";
-import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import { useUserState } from "../../hooks/useUserState";
 
 const RADIUS = 2;
@@ -47,13 +47,13 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
           y: cameraPosition.y,
           z: z,
           duration: ANIMATION_TIME,
-          easing: "easeInOutQuad",
-          complete: () => {
-            camera.lookAt(activeCardPosition);
-            orbitControls.target.copy(activeCardPosition);
-            orbitControls.update();
-          },
+          easing: "linear",
+          complete: () => {},
         });
+
+        camera.lookAt(activeCardPosition);
+        orbitControls.target.copy(activeCardPosition);
+        orbitControls.update();
       }
     }
   }, [selectedIndex]);
@@ -75,10 +75,12 @@ const Carousel: React.FC<{ initialCards: IFrameProps[] }> = ({
       />
       <group ref={carouselRef}>
         {initialCards.map((props, index) => {
-          const isActive = index === selectedIndex;
+          // const isActive = index === selectedIndex;
           const angle = (2 * Math.PI * index) / totalCards;
-          const x = Math.cos(angle) * (RADIUS + DISTANCE * (isActive ? 0 : 1));
-          const z = Math.sin(angle) * (RADIUS + DISTANCE * (isActive ? 0 : 1));
+          const dist = RADIUS + DISTANCE; // (isActive ? 0 : 1);
+          const x = Math.cos(angle) * dist;
+          const z = Math.sin(angle) * dist;
+
           return (
             <Card
               onPointerDown={(e) => {

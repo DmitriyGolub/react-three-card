@@ -1,10 +1,9 @@
-import React, { Ref, useEffect, useRef, useState } from "react";
+import React, { Ref, useEffect, useRef } from "react";
 import {
   MeshPortalMaterial,
   PortalMaterialType,
   RoundedBox,
   Text,
-  useCursor,
   useTexture,
 } from "@react-three/drei";
 import {
@@ -20,6 +19,7 @@ import {
 import { useFrame } from "@react-three/fiber";
 import { GroupProps } from "@react-three/fiber/dist/declarations/src/three-types";
 import anime from "animejs";
+import { lerp, randFloat, randInt } from "three/src/math/MathUtils";
 
 import { BackgroundSphere } from "../../../components/BackgroundSphere";
 import cardBackTexture from "textures/card_fallback.png";
@@ -56,66 +56,75 @@ export const Card: React.FC<IFrameProps> = ({
   const cardBack: Texture = useTexture(cardBackTexture).clone();
   cardBack.colorSpace = SRGBColorSpace;
 
-  const [hovered, hover] = useState(false);
-  useCursor(hovered);
-
   //#region "Animations"
   useEffect(() => {
     //for active state
     if (active) {
+      anime.remove((ref.current as Group).scale);
+
       anime({
         targets: [(ref.current as Group).scale],
-        x: 2,
-        y: 2,
-        z: 2,
-        duration: 400,
+        x: 1.75,
+        y: 1.75,
+        z: 1.75,
+        duration: 600,
         easing: "linear",
       });
     } else {
+      anime.remove((ref.current as Group).scale);
+
       anime({
         targets: [(ref.current as Group).scale],
         x: 1,
         y: 1,
         z: 1,
-        duration: 400,
+        duration: 600,
         easing: "linear",
       });
+
+      console.log("useEffect");
     }
-    //for hidden
-    if (hidden) {
-      anime({
-        targets: [(ref.current as Group).rotation],
-        y: Math.PI / 2,
-        duration: 400,
-        easing: "easeInCubic",
-        complete: () => {
-          ref.current!.lookAt(ref.current!.position.clone().multiplyScalar(2));
-        },
-      });
-    } else {
-      (ref.current as Group).rotation.y = 0;
-    }
-  });
+  }, [active]);
   //#endregion "My Region"
 
   //#region "Flying Frame Animation"
-  useFrame((delta) => {
+  const xAngle = randInt(-10, 10);
+  const yAngle = randInt(-100, 100);
+  const angleXMod = randInt(1, 100);
+  const randomHeight = randInt(5, 10);
+  const randomMultiplication = randFloat(1, 5);
+  const maxHeight = randFloat(-1, 2);
+  const preRotation = (t: number) =>
+    new Euler(
+      Math.cos(t / xAngle) / angleXMod,
+      Math.sin(t / yAngle) / 0.1,
+      0 - (maxHeight - Math.sin(t / randomMultiplication)) / 50
+    );
+  useFrame((rootState) => {
     if (!ref.current) return;
-    const t = delta.clock.getElapsedTime();
+    const t = rootState.clock.getElapsedTime();
 
     if (!active) {
-      ref.current.rotation.set(
-        Math.cos(t / 4) / 100,
-        Math.sin(t / 20) / 8,
-        0 - (1 + Math.sin(t / 3)) / 50
-      );
-      ref.current.position.y = (1 + Math.sin(t / 1.5)) / 10;
+      ref.current.rotation.copy(preRotation(t));
+      ref.current.position.y = (maxHeight + Math.sin(t / 1.5)) / randomHeight;
     } else {
-      ref.current.rotation.set(0, 0, 0);
-      ref.current.position.y = 0;
+      const targetPosition = [0, 0.1, 0];
+      const targetRotation = [0, 0, 0];
+
+      ref.current.rotation.set(
+        lerp(ref.current.rotation.x, targetRotation[0], t),
+        lerp(ref.current.rotation.y, targetRotation[1], t),
+        lerp(ref.current.rotation.z, targetRotation[2], t)
+      );
+
+      ref.current.position.y = lerp(
+        ref.current.position.y,
+        targetPosition[1],
+        0.1
+      );
     }
 
-    ref.current.lookAt(new Vector3(0, 0, 0));
+    ref.current.lookAt(new Vector3(0, 0.1, 0));
   });
   //#endregion "Flying Frame Animation"
 
@@ -150,7 +159,7 @@ export const Card: React.FC<IFrameProps> = ({
       >
         {author}
       </Text>
-      <mesh onPointerOver={() => hover(true)} onPointerOut={() => hover(false)}>
+      <mesh>
         <RoundedBox
           rotation={new Euler(0, -Math.PI, 0)}
           args={[width, height, 0]}
